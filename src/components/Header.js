@@ -10,6 +10,7 @@ const Header = (props) => {
             <img src="/images/home-logo.svg" alt="logo" />
           </Link>
         </Logo>
+
         <Search>
           <div>
             <input type="text" placeholder="Search" />
@@ -18,6 +19,56 @@ const Header = (props) => {
             <img src="/images/search-icon.svg" alt="" />
           </SearchIcon>
         </Search>
+        <Nav>
+          <NavListWrap>
+            <NavList className="active">
+              <Link to="/">
+                <img src="/images/nav-home.svg" alt="navHome" />
+                <span>Home</span>
+              </Link>
+            </NavList>
+            <NavList>
+              <Link to="/">
+                <img src="/images/nav-network.svg" alt="" />
+                <span>My Network</span>
+              </Link>
+            </NavList>
+            <NavList>
+              <Link to="/">
+                <img src="/images/nav-jobs.svg" alt="" />
+                <span>Jobs</span>
+              </Link>
+            </NavList>
+            <NavList>
+              <Link to="/">
+                <img src="/images/nav-messaging.svg" alt="" />
+                <span>Messaging</span>
+              </Link>
+            </NavList>
+            <NavList>
+              <Link to="/">
+                <img src="/images/nav-notifications.svg" alt="" />
+                <span>Notifications</span>
+              </Link>
+            </NavList>
+            <User>
+              <Link to="/">
+                <img src="/images/user.svg" alt="" />
+                <span>Me</span>
+              </Link>
+
+              <SignOut>
+                <Link to="/">Sign Out</Link>
+              </SignOut>
+            </User>
+            <Work>
+              <Link to="/">
+                <img src="/images/nav-work.svg" alt="" />
+                <span>Work</span>
+              </Link>
+            </Work>
+          </NavListWrap>
+        </Nav>
       </Content>
     </Container>
   );
@@ -84,4 +135,115 @@ const SearchIcon = styled.div`
   justify-content: center;
   align-items: center;
 `;
+
+const Nav = styled.div`
+  margin-left: auto;
+  display: block;
+  @media (max-width: 768px) {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background: white;
+    width: 100%;
+  }
+`;
+
+const NavListWrap = styled.ul`
+  display: flex;
+  flex-wrap: nowrap;
+
+  .active {
+    span::after {
+      content: "";
+      transform: scaleX(1);
+      border-bottom: 2px solid var(--white, #fff);
+      bottom: 0;
+      left: 0;
+      position: absolute;
+      transition: transform 0.2s ease-in-out;
+      width: 100%;
+      border-color: rgba(0, 0, 0, 0.9);
+    }
+  }
+  @media (max-width: 768px) {
+    overflow-x: auto;
+  }
+`;
+
+const NavList = styled.li`
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
+  a {
+    align-items: center;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+    font-weight: 400;
+    justify-content: center;
+    line-height: 1.5;
+    min-height: 52px;
+    min-width: 80px;
+    position: relative;
+    text-decoration: none;
+    span {
+      color: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+    }
+    @media (max-width: 768px) {
+      min-width: 70px;
+    }
+  }
+  &:hover,
+  &:active {
+    a {
+      span {
+        color: rgba(0, 0, 0, 0.9);
+      }
+    }
+  }
+`;
+
+const SignOut = styled.div`
+  position: absolute;
+  top: 45px;
+  background: white;
+  border-radius: 0 0 5px 5px;
+  width: 100px;
+  height: 40px;
+  font-size: 16px;
+  transition-duration: 167ms;
+  text-align: center;
+  display: none;
+`;
+
+const User = styled(NavList)`
+  a > svg {
+    width: 24px;
+    border-radius: 50%;
+  }
+  a > img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+  }
+  span {
+    display: flex;
+    align-items: center;
+  }
+  &:hover {
+    ${SignOut} {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+    }
+  }
+`;
+
+const Work = styled(User)`
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
+`;
+
 export default Header;
