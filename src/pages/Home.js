@@ -1,14 +1,16 @@
 import React, { Fragment } from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import Header from "../components/Header";
 import LeftSide from "../components/LeftSide";
 import RightSide from "../components/RightSide";
 import Main from "../components/Main";
+import { connect } from "react-redux";
 
-const Home = () => {
+const Home = (props) => {
   return (
     <Fragment>
+      {!props.user && <Navigate to="/login" />}
       <Header />
       <Container>
         <Section>
@@ -83,4 +85,10 @@ const Layout = styled.div`
   }
 `;
 
-export default Home;
+const mapStateToProps = (state) => {
+  return {
+    user: state.user.user,
+  };
+};
+
+export default connect(mapStateToProps)(Home);

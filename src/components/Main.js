@@ -1,5 +1,5 @@
 import styled from "styled-components";
-
+import PostModal from "./PostModal";
 const Main = () => {
   return (
     <Container>
@@ -88,6 +88,7 @@ const Main = () => {
           </SocialActions>
         </Article>
       </div>
+      <PostModal />
     </Container>
   );
 };
