@@ -1,12 +1,21 @@
+import { useState } from "react";
 import styled from "styled-components";
 import PostModal from "./PostModal";
+
 const Main = () => {
+  const [showModal, setShowModal] = useState("close");
+
+  const clickHandler = (e) => {
+    e.preventDefault();
+    setShowModal(showModal === "close" ? "open" : "close");
+  };
+
   return (
     <Container>
       <SharedBox>
         <div>
           <img src="/images/user.svg" alt="" />
-          <button>Start a post</button>
+          <button onClick={clickHandler}>Start a post</button>
         </div>
         <div>
           <button>
@@ -42,7 +51,7 @@ const Main = () => {
               </div>
             </a>
             <button>
-              <img src="/images/like-icon.svg" width={16} alt="" />
+              <img src="/images/like-icon.svg" width={8} alt="" />
             </button>
           </SharedActor>
           <Description>Description</Description>
@@ -88,7 +97,7 @@ const Main = () => {
           </SocialActions>
         </Article>
       </div>
-      <PostModal />
+      <PostModal onShowModal={showModal} onClickHandler={clickHandler} />
     </Container>
   );
 };

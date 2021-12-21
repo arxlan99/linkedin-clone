@@ -6,10 +6,12 @@ import NotFound from "./pages/NotFound";
 import { Fragment, useEffect } from "react";
 import { getUserAuth } from "./actions";
 import { connect } from "react-redux";
+import styled from "styled-components";
 
 function App(props) {
   useEffect(() => {
     props.getUserAuth();
+    console.log(props.loading);
   }, [props]);
 
   return (
@@ -31,9 +33,17 @@ function App(props) {
   );
 }
 
+const Spinner = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+`;
+
 const mapStateToProps = (state) => {
   return {
     user: state.user.user,
+    loading: state.user.loading,
   };
 };
 
@@ -44,3 +54,26 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
+
+// eslint-disable-next-line no-lone-blocks
+{
+  /* <BrowserRouter>
+      {props.loading ? (
+        <Spinner>Loading...</Spinner>
+      ) : (
+        <Routes>
+          {!props.user ? (
+            <Route path="*" element={<Login />} />
+          ) : (
+            <Fragment>
+              <Route path="/Login" element={<Login />} />
+              <Route path="/" element={<Home />}>
+                <Route path="/Home" />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Fragment>
+          )}
+        </Routes>
+      )}
+    </BrowserRouter> */
+}

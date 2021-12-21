@@ -1,42 +1,163 @@
-import styled from "styled-components";
+import { useState, Fragment } from "react";
+import styled, { keyframes } from "styled-components";
+import ReactPlayer from "react-player";
+import { connect } from "react-redux";
+import { serverTimestamp } from "firebase/firestore";
+import { postArticleAPI } from "../actions";
 
 const PostModal = (props) => {
+  const [editorText, setEditorText] = useState();
+  const [shareImage, setShareImage] = useState();
+  const [videoLink, setVideoLink] = useState();
+  const [assetArea, setAssetArea] = useState();
+
+  const changeHandler = (e) => {
+    const image = e.target.files[0];
+
+    if (image === "" || image === undefined) {
+      alert("Please select an image");
+      return;
+    }
+    setShareImage(image);
+  };
+
+  const switchAssetArea = (area) => {
+    setShareImage("");
+    setVideoLink("");
+    setAssetArea(area);
+  };
+
+  const postArticle = (e) => {
+    e.preventDefault();
+    if (e.target !== e.currentTarget) {
+      return;
+    }
+
+    const payload = {
+      image: shareImage,
+      video: videoLink,
+      user: props.user,
+      description: editorText,
+      timestamp: serverTimestamp(),
+    };
+
+    props.postArticle(payload);
+    props.onClickHandler(e);
+  };
+
+  const resetHandler = (e) => {
+    e.preventDefault();
+    setEditorText("");
+    setShareImage("");
+    setVideoLink("");
+    setAssetArea("");
+    props.onClickHandler(e);
+  };
+
   return (
-    <Container>
-      <Content>
-        <Header>
-          <h2>Create a post</h2>
-          <button>
-            <img src="/images/close-icon.svg" alt="" width={20} />
-          </button>
-        </Header>
-        <SharedContent>
-          <UserInfo>
-            <img src="/images/user.svg" alt="" />
-            <span>Name</span>
-          </UserInfo>
-        </SharedContent>
-        <ShareCreation>
-          <AttachAssets>
-            <AssetButton>
-              <img src="/images/share-image.svg" alt="" width={16} />
-            </AssetButton>
-            <AssetButton>
-              <img src="/images/youtube-brands.svg" alt="" width={22} />
-            </AssetButton>
-          </AttachAssets>
-          <ShareComment>
-            <AssetButton>
-              <img src="/images/comment-dots-regular.svg" alt="" width={22} />
-              Anyone
-            </AssetButton>
-          </ShareComment>
-          <PostButton>Post</PostButton>
-        </ShareCreation>
-      </Content>
-    </Container>
+    <Fragment>
+      {props.onShowModal === "open" ? (
+        <Container>
+          <Content>
+            <Header>
+              <h2>Create a post</h2>
+              <button onClick={(e) => resetHandler(e)}>
+                <img src="/images/close-icon.svg" alt="" width={20} />
+              </button>
+            </Header>
+            <SharedContent>
+              <UserInfo>
+                {props.user.photoURL ? (
+                  <img src={props.user.photoURL} alt="" />
+                ) : (
+                  <img src="/images/user.svg" alt="" />
+                )}
+                <span>{props.user.displayName}</span>
+              </UserInfo>
+              <Editor>
+                <textarea
+                  value={editorText}
+                  onChange={(e) => setEditorText(e.target.value)}
+                  placeholder="What's up man???"
+                  autoFocus={true}
+                />
+                {assetArea === "image" ? (
+                  <UploadImage>
+                    <input
+                      type="file"
+                      accept="image/gif, image/jpeg, image/png"
+                      name="image"
+                      id="file"
+                      style={{ display: "none" }}
+                      onChange={changeHandler}
+                    />
+                    <p>
+                      <label htmlFor="file"> Select an image to share </label>
+                    </p>
+
+                    {shareImage && (
+                      <img src={URL.createObjectURL(shareImage)} alt="" />
+                    )}
+                  </UploadImage>
+                ) : (
+                  assetArea === "media" && (
+                    <Fragment>
+                      <input
+                        type="text"
+                        placeholder="Please input a video link"
+                        value={videoLink}
+                        onChange={(e) => setVideoLink(e.target.value)}
+                      />
+                      {videoLink && (
+                        <ReactPlayer width={"%100"} url={videoLink} />
+                      )}
+                    </Fragment>
+                  )
+                )}
+              </Editor>
+            </SharedContent>
+            <ShareCreation>
+              <AttachAssets>
+                <AssetButton onClick={() => switchAssetArea("image")}>
+                  <img src="/images/share-image.svg" alt="" width={16} />
+                </AssetButton>
+                <AssetButton onClick={() => switchAssetArea("media")}>
+                  <img src="/images/youtube-brands.svg" alt="" width={22} />
+                </AssetButton>
+              </AttachAssets>
+              <ShareComment>
+                <AssetButton>
+                  <img
+                    src="/images/comment-dots-regular.svg"
+                    alt=""
+                    width={22}
+                  />
+                  Anyone
+                </AssetButton>
+              </ShareComment>
+              <PostButton
+                disabled={!editorText ? true : false}
+                onClick={(e) => postArticle(e)}
+              >
+                Post
+              </PostButton>
+            </ShareCreation>
+          </Content>
+        </Container>
+      ) : null}
+    </Fragment>
   );
 };
+
+const rotate = keyframes`
+  from {
+    opacity: 0.5;
+  }
+
+  to {
+    opacity: 1;
+  }
+`;
 
 const Container = styled.div`
   position: fixed;
@@ -47,6 +168,7 @@ const Container = styled.div`
   z-index: 999;
   color: black;
   background-color: rgba(0, 0, 0, 0.7);
+  animation: ${rotate} 0.5s;
 `;
 
 const Content = styled.div`
@@ -153,14 +275,49 @@ const PostButton = styled.div`
   padding-left: 16px;
   padding-right: 16px;
   background: #0a66c2;
-  color: white;
+  color: ${(props) => (props.disabled ? "black" : "white")};
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.1s ease-in-out;
+  background-color: ${(props) => (props.disabled ? "#e6e6e6" : "#0a66c2")};
   &:hover {
-    background: #004182;
+    background: ${(props) => (props.disabled ? "gray" : "#004182")};
   }
 `;
 
-export default PostModal;
+const Editor = styled.div`
+  padding: 12px 24px;
+  textArea {
+    width: 100%;
+    min-height: 100px;
+    resize: none;
+  }
+  input {
+    width: 100%;
+    height: 35px;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+`;
+
+const UploadImage = styled.div`
+  text-align: center;
+  img {
+    width: 100%;
+  }
+`;
+
+const mapStateToProps = (state) => {
+  return {
+    user: state.user.user,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    postArticle: (payload) => dispatch(postArticleAPI(payload)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PostModal);
