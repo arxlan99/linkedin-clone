@@ -10,9 +10,9 @@ import { connect } from "react-redux";
 const Home = (props) => {
   return (
     <Fragment>
-      {!props.user && <Navigate to="/login" />}
       <Header />
       <Container>
+        <img src="/images/loading-spinner" alt="" />
         <Section>
           <h5>
             <Link to="#!">Hiring in a hurry? </Link>

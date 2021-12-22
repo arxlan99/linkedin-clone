@@ -1,9 +1,21 @@
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
 import { signOutApi } from "../actions";
+import { useEffect } from "react";
 
 const Header = (props) => {
+  const navigate = useNavigate();
+  const handleSignOut = () => {
+    props.signOut();
+  };
+
+  useEffect(() => {
+    if (!props.user) {
+      navigate("/login");
+    }
+  }, [props.user, navigate]);
+
   return (
     <Container>
       <Content>
@@ -63,8 +75,8 @@ const Header = (props) => {
                 <span>Me</span>
               </Link>
 
-              <SignOut onClick={() => props.signOut()}>
-                <Link to="/">Sign Out</Link>
+              <SignOut onClick={handleSignOut}>
+                <Link to="">Sign Out</Link>
               </SignOut>
             </User>
             <Work>

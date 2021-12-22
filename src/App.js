@@ -3,42 +3,28 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
-import { Fragment, useEffect } from "react";
+import { useEffect } from "react";
 import { getUserAuth } from "./actions";
 import { connect } from "react-redux";
-import styled from "styled-components";
 
 function App(props) {
   useEffect(() => {
     props.getUserAuth();
-    console.log(props.loading);
   }, [props]);
+  console.log(process.env.REACT_APP_FIREBASE_API_KEY);
 
   return (
     <BrowserRouter>
       <Routes>
-        {!props.user ? (
-          <Route path="*" element={<Login />} />
-        ) : (
-          <Fragment>
-            <Route path="/Login" element={<Login />} />
-            <Route path="/" element={<Home />}>
-              <Route path="/Home" />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Fragment>
-        )}
+        <Route path="/Login" element={<Login />} />
+        <Route path="/" element={<Home />}>
+          <Route path="/Home" element={<Home />} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
 }
-
-const Spinner = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-`;
 
 const mapStateToProps = (state) => {
   return {

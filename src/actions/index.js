@@ -1,13 +1,19 @@
-import db, { auth, provider, storage } from "../firebase";
+import db, { auth, provider } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
-import { SET_USER } from "./actionType";
+import { GET_ARTICLES, SET_LOADING_STATUS, SET_USER } from "./actionType";
 import {
   getDownloadURL,
   getStorage,
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { addDoc, collection } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  orderBy,
+  query,
+} from "firebase/firestore";
 
 export function signinApi() {
   return (dispatch) => {
@@ -16,7 +22,6 @@ export function signinApi() {
         dispatch({
           type: SET_USER,
           payload: result.user,
-          loading: false,
         });
       })
       .catch((err) => {
@@ -32,7 +37,6 @@ export function getUserAuth() {
         dispatch({
           type: SET_USER,
           payload: user,
-          loading: false,
         });
       }
     });
@@ -47,7 +51,6 @@ export function signOutApi() {
         dispatch({
           type: SET_USER,
           payload: null,
-          loading: false,
         });
       })
       .catch((err) => {
@@ -59,6 +62,12 @@ export function signOutApi() {
 export function postArticleAPI(payload) {
   return (dispatch) => {
     if (payload.image !== "") {
+      // set loading status true
+      dispatch({
+        type: SET_LOADING_STATUS,
+        payload: true,
+      });
+
       const storage = getStorage();
       const storageRef = ref(storage, `images/${payload.image.name}`);
 
@@ -89,7 +98,7 @@ export function postArticleAPI(payload) {
             url = downloadURL;
           });
 
-          const docRef = await addDoc(collection(db, "temp"), {
+          const docRef = await addDoc(collection(db, "articles"), {
             actor: {
               description: payload.user.email,
               date: payload.timestamp,
@@ -102,6 +111,47 @@ export function postArticleAPI(payload) {
           });
         }
       );
+
+      // set loading status false
+      dispatch({
+        type: SET_LOADING_STATUS,
+        payload: false,
+      });
+    } else if (payload.video !== "") {
+      const docRef = addDoc(collection(db, "articles"), {
+        actor: {
+          description: payload.user.email,
+          date: payload.timestamp,
+          image: payload.user.photoURL,
+        },
+        comments: 0,
+        sharedImg: "",
+        video: payload.video,
+        description: payload.description,
+      });
+
+      // set loading status false
+      dispatch({
+        type: SET_LOADING_STATUS,
+        payload: false,
+      });
     }
+  };
+}
+
+export function getArticlesApi() {
+  return async (dispatch) => {
+    const collectionRef = collection(db, "articles");
+    const queryRef = query(collectionRef, orderBy("actor.date", "desc"));
+    const querySnapshot = await getDocs(queryRef);
+
+    const articles = [];
+    querySnapshot.forEach((doc) => {
+      articles.push(doc.data());
+    });
+    dispatch({
+      type: GET_ARTICLES,
+      payload: articles,
+    });
   };
 }
