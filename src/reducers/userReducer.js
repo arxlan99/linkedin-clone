@@ -1,7 +1,7 @@
 import { SET_USER } from "../actions/actionType";
 
 const INITAIL_STATE = {
-  user: null,
+  user: localStorage.getItem("user") || null,
 };
 
 export const userReducer = (state = INITAIL_STATE, action) => {

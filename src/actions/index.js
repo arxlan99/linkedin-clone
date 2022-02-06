@@ -15,6 +15,8 @@ import {
   query,
 } from "firebase/firestore";
 
+import { useState } from "react";
+
 export function signinApi() {
   return (dispatch) => {
     signInWithPopup(auth, provider)
@@ -23,6 +25,7 @@ export function signinApi() {
           type: SET_USER,
           payload: result.user,
         });
+        localStorage.setItem("user", JSON.stringify(result.user.displayName));
       })
       .catch((err) => {
         alert(err);
@@ -33,6 +36,7 @@ export function signinApi() {
 export function getUserAuth() {
   return (dispatch) => {
     auth.onAuthStateChanged(async (user) => {
+      console.log(user);
       if (user) {
         dispatch({
           type: SET_USER,
@@ -52,6 +56,7 @@ export function signOutApi() {
           type: SET_USER,
           payload: null,
         });
+        localStorage.removeItem("user");
       })
       .catch((err) => {
         alert(err);

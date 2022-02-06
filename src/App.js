@@ -12,7 +12,8 @@ import styled from "styled-components";
 function App(props) {
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  /* Alternative to listen auth */
+  /*   useEffect(() => {
     props.getUserAuth();
   }, [props]);
 
@@ -29,7 +30,7 @@ function App(props) {
         <img src="/images/spinner.svg" alt="" />
       </Spinner>
     );
-  }
+  } */
 
   return (
     <BrowserRouter>
